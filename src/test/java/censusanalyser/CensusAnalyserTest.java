@@ -26,6 +26,16 @@ public class CensusAnalyserTest {
 		} catch (CensusAnalyserException e) {
 		}
 	}
+	
+	@Test
+	public void givenIndianCensusCommonsCSVFile_ShouldReturnsCorrectRecords() {
+		try {
+			CensusAnalyser censusAnalyser = new CensusAnalyser();
+			int numOfRecords = censusAnalyser.loadIndiaCensusDataCommonsCsv(INDIA_CENSUS_CSV_FILE_PATH);
+			Assert.assertEquals(29, numOfRecords);
+		} catch (CensusAnalyserException e) {
+		}
+	}
 
 	@Test
 	public void givenIndiaCensusCSVFile_WithWrongFilePath_ShouldThrowCustomException() {
