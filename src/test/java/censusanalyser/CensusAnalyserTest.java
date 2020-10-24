@@ -4,6 +4,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.google.gson.Gson;
+
+
 public class CensusAnalyserTest {
 
 	private static final String INDIA_CENSUS_CSV_FILE_PATH = "./src/test/resources/IndiaStateCensusData.csv";
@@ -141,6 +144,19 @@ public class CensusAnalyserTest {
 			censusAnalyser.loadIndiaStateCode(INDIA_STATECODE_CSV_WRONG_HEADER_FILE_PATH);
 		} catch (CensusAnalyserException e) {
 			Assert.assertEquals(CensusAnalyserException.ExceptionType.CENSUS_DELIMITER_HEADER_PROBLEM, e.type);
+		}
+	}
+	
+	@Test
+	public void givenIndiaCensusData_WhenSorted_ShouldReturnResult() {
+		try {
+			CensusAnalyser censusAnalyser = new CensusAnalyser();
+			censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+			String sortedCensusData = censusAnalyser.getStateWiseSortedData();
+			IndiaCensusCSV[] censusCSV=new Gson().fromJson(sortedCensusData,IndiaCensusCSV[].class);
+			Assert.assertEquals("Andhra Pradesh", censusCSV[0].state);
+		} catch (CensusAnalyserException e) {
+			e.printStackTrace();
 		}
 	}
 }

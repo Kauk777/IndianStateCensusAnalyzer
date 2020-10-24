@@ -1,3 +1,1 @@
 rootProject.name = 'CensusAnalyser'
-include ':CSVBuilder'
-project(':CSVBuilder').projectDir=new File(SettingsDir, '../CSVBuilder')
