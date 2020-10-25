@@ -1,5 +1,6 @@
 package censusanalyser;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Field;
@@ -20,6 +21,7 @@ public class CensusAnalyser {
 	List<IndiaCensusCSV> censusCSVList=null;
 	List<IndiaStateCodeCSV> stateCodeList = null;
 			
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public int loadIndiaCensusData(String csvFilePath) throws CensusAnalyserException {
 		try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
 			ICSVBuilder csvBuilder=CSVBuildFactory.createCsvFile();
@@ -34,6 +36,7 @@ public class CensusAnalyser {
 		}
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public int loadIndiaStateCode(String csvFilePath) throws CensusAnalyserException {
 		try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
 			ICSVBuilder csvBuilder=CSVBuildFactory.createCsvFile();
@@ -48,6 +51,7 @@ public class CensusAnalyser {
 		}
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public int loadIndiaCensusDataCommonsCsv(String csvFilePath) throws CensusAnalyserException {
 		try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
 			ICSVBuilder csvBuilder=CSVBuildFactory.createCommonsCsvFile();
@@ -67,7 +71,16 @@ public class CensusAnalyser {
 		int numOfEntries = (int) StreamSupport.stream(csvIterable.spliterator(), false).count();
 		return numOfEntries;
 	}
+	
+	public void writingJsonFile(String gson, String filePath) {
+		try(FileWriter writer=new FileWriter(filePath);) {
+			writer.write(gson);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public String getStateWiseSortedData(String fieldName, boolean reverse) throws CensusAnalyserException {
 		if(censusCSVList==null || censusCSVList.size()==0) {
 			throw new CensusAnalyserException("No census data",
@@ -110,6 +123,7 @@ public class CensusAnalyser {
 
 	public Comparator<IndiaCensusCSV> sortByField(String fieldName) {
 		Comparator<IndiaCensusCSV> comparator=new Comparator<IndiaCensusCSV>() {
+			@SuppressWarnings({ "rawtypes", "unchecked" })
 			@Override
 			public int compare(IndiaCensusCSV obj1, IndiaCensusCSV obj2) {
 				try {
@@ -119,6 +133,7 @@ public class CensusAnalyser {
 					Comparable field2=(Comparable) field.get(obj2);
 					return field1.compareTo(field2);
 				} catch (Exception e) {
+					// if filedName is not proper then return 0
 					e.printStackTrace();
 					return 0;
 				} 

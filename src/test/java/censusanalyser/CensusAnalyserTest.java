@@ -19,6 +19,8 @@ public class CensusAnalyserTest {
 	private static final String INDIA_STATECODE_WRONG_CSV_FILE_TYPE = "./src/test/resources/IndiaStateCode.txt";
 	private static final String INDIA_STATECODE_CSV_DELIMITER_FILE_PATH = "./src/test/resources/IndiaStateCodeDelimiterIncorrect.csv";
 	private static final String INDIA_STATECODE_CSV_WRONG_HEADER_FILE_PATH = "./src/test/resources/IndiaStateCodeWrongHeader.csv";
+	private static final String AREA_CENSUS_FILE="./src/test/resources/IndiaCensusArea.json";
+	private static final String POPULATION_CENSUS_FILE="./src/test/resources/IndiaCensusPopulation.json";
 
 	@Test
 	public void givenIndianCensusCSVFile_ShouldReturnsCorrectRecords() {
@@ -179,6 +181,7 @@ public class CensusAnalyserTest {
 			CensusAnalyser censusAnalyser = new CensusAnalyser();
 			censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
 			String sortedCensusData = censusAnalyser.getStateWiseSortedData("population",true);
+			censusAnalyser.writingJsonFile(sortedCensusData, POPULATION_CENSUS_FILE);
 			IndiaCensusCSV[] censusCSV=new Gson().fromJson(sortedCensusData,IndiaCensusCSV[].class);
 			Assert.assertEquals("Uttar Pradesh", censusCSV[0].state);
 		} catch (CensusAnalyserException e) {
@@ -194,6 +197,20 @@ public class CensusAnalyserTest {
 			String sortedCensusData = censusAnalyser.getStateWiseSortedData("densityPerSqKm",true);
 			IndiaCensusCSV[] censusCSV=new Gson().fromJson(sortedCensusData,IndiaCensusCSV[].class);
 			Assert.assertEquals("Bihar", censusCSV[0].state);
+		} catch (CensusAnalyserException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void givenIndiaCensusData_WhenSortedByArea_ShouldReturnResult() {
+		try {
+			CensusAnalyser censusAnalyser = new CensusAnalyser();
+			censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+			String sortedCensusData = censusAnalyser.getStateWiseSortedData("areaInSqKm",true);
+			censusAnalyser.writingJsonFile(sortedCensusData, AREA_CENSUS_FILE);
+			IndiaCensusCSV[] censusCSV=new Gson().fromJson(sortedCensusData,IndiaCensusCSV[].class);
+			Assert.assertEquals("Rajasthan", censusCSV[0].state);
 		} catch (CensusAnalyserException e) {
 			e.printStackTrace();
 		}
