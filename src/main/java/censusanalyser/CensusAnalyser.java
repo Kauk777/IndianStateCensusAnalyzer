@@ -2,8 +2,10 @@ package censusanalyser;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +17,7 @@ import CSVBuilder.*;
 
 public class CensusAnalyser {
 	
-	List<IndiaCensusCSV> censusCSVList = null;
+	List<IndiaCensusCSV> censusCSVList=null;
 	List<IndiaStateCodeCSV> stateCodeList = null;
 			
 	public int loadIndiaCensusData(String csvFilePath) throws CensusAnalyserException {
@@ -66,16 +68,18 @@ public class CensusAnalyser {
 		return numOfEntries;
 	}
 
-	public String getStateWiseSortedData() throws CensusAnalyserException {
+	public String getStateWiseSortedData(String fieldName, boolean reverse) throws CensusAnalyserException {
 		if(censusCSVList==null || censusCSVList.size()==0) {
 			throw new CensusAnalyserException("No census data",
 					CensusAnalyserException.ExceptionType.NO_CENSUS_DATA);
 		}
-		Comparator<IndiaCensusCSV> censusComparator=Comparator.comparing(census->census.state);
-		this.sort(censusComparator);
+		Comparator myComparator=sortByField(fieldName);
+		if(reverse)
+		Collections.sort(censusCSVList, myComparator.reversed());
+		else
+		Collections.sort(censusCSVList, myComparator);
 		String sortedStateData=new Gson().toJson(censusCSVList);
 		return sortedStateData;
-		
 	}
 	
 	public String getStateCodeSortedData() throws CensusAnalyserException {
@@ -104,16 +108,23 @@ public class CensusAnalyser {
 		
 	}
 
-	private void sort(Comparator<IndiaCensusCSV> censusComparator) {
-		for(int i=0;i<censusCSVList.size()-1;i++) {
-			for(int j=0;j<censusCSVList.size()-1;j++) {
-				IndiaCensusCSV census1= censusCSVList.get(j);
-				IndiaCensusCSV census2= censusCSVList.get(j+1);
-				if(censusComparator.compare(census1, census2)>0) {
-					censusCSVList.set(j, census2);
-					censusCSVList.set(j+1, census1);
-				}
+	public Comparator<IndiaCensusCSV> sortByField(String fieldName) {
+		Comparator<IndiaCensusCSV> comparator=new Comparator<IndiaCensusCSV>() {
+			@Override
+			public int compare(IndiaCensusCSV obj1, IndiaCensusCSV obj2) {
+				try {
+					Field field = IndiaCensusCSV.class.getDeclaredField(fieldName);
+					field.setAccessible(true);
+					Comparable field1=(Comparable) field.get(obj1);
+					Comparable field2=(Comparable) field.get(obj2);
+					return field1.compareTo(field2);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return 0;
+				} 
 			}
-		}
+		};
+	return comparator;
 	}
+	
 }
